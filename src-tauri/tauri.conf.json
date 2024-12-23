@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "幸运男孩",
+  "productName": "lucky-students",
   "version": "0.1.0",
   "identifier": "com.vimsucks.lucky-students",
   "build": {
