@@ -3,6 +3,7 @@ import { Button, Checkbox, Input, InputNumber, Space, Tag, Tooltip, Typography, 
 import { useRef, useState } from 'react';
 import { useRollCallConfig } from '../../context/roll-call';
 import { useStep } from '../../context/step';
+import { readStudentListFile } from './reader';
 
 
 
@@ -24,25 +25,12 @@ const RollCallConfig = () => {
                     draggable
                     dragIcon={<IconUserGroup />}
                     action=""
-                    accept=".txt"
+                    accept=".txt,.xls,.xlsx"
                     dragMainText="点击上传学生名单（支持拖拽）"
-                    dragSubText="支持 .txt 文件"
+                    dragSubText="支持 txt/xls/xlsx 文件"
                     beforeUpload={({ file }) => {
                         if (file?.fileInstance) {
-                            const reader = new FileReader();
-                            reader.readAsText(file.fileInstance);
-                            reader.onload = () => {
-                                setStudents(
-                                    (reader.result as string || "").split(/[\s,，]+/)
-                                        .map(s => s.trim())
-                                        .filter(s => !!s)
-                                        .map(name => ({
-                                            name
-                                        }))
-                                )
-
-                                console.log(reader.result);
-                            };
+                            readStudentListFile(file.fileInstance!!).then(setStudents);
                         }
                         return {
                             autoRemove: true
