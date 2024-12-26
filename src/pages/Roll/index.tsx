@@ -35,6 +35,7 @@ const Roll = () => {
                 setRemainingStudents([]);
             }
         }
+        return !studentsThisRound.length;
     }, [intervalRef, calledStudentsRef, students, removeCalled, remainingStudents, setRolling, setRemainingStudents]);
 
     const pause = useCallback(() => {
@@ -48,7 +49,10 @@ const Roll = () => {
     }, [roll, intervalRef, setRolling, removeCalled, calledStudentsRef, setRemainingStudents])
 
     const start = useCallback(() => {
-        roll();
+        const terminated = roll();
+        if (terminated) {
+            return;
+        }
         setRolling(true);
         intervalRef.current && clearInterval(intervalRef.current);
         intervalRef.current = setInterval(roll, intervalMillis);
