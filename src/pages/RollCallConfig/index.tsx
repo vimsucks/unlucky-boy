@@ -8,7 +8,7 @@ import { readStudentListFile } from './reader';
 
 
 const RollCallConfig = () => {
-    const { students, setStudents, removeCalled, setRemoveCalled, callCount, setCallCount } = useRollCallConfig();
+    const { students, setStudents, removeCalled, setRemoveCalled, callCount, setCallCount, intervalMillis, setIntervalMillis } = useRollCallConfig();
     const [search, setSearch] = useState<string>("");
     const { next } = useStep();
     const uploadRef = useRef<Upload>(null);
@@ -65,12 +65,15 @@ const RollCallConfig = () => {
                     onChange={e => setRemoveCalled(!e.target.checked)}
                 >
                     允许重复点名同一个人
-                    <Tooltip content="勾选后，同一轮点名内不会点到同一个人两次">
+                    <Tooltip content="勾选后，同一轮点名内有可能会点到同一个人多次">
                         <IconHelpCircle />
                     </Tooltip>
                 </Checkbox>
                 <Typography.Text>
                     同时点 <InputNumber value={callCount} onChange={v => setCallCount(v as number)} style={{ width: '5em' }} min={1} max={students.length || 1} /> 位学生
+                </Typography.Text>
+                <Typography.Text>
+                    滚动间隔 <InputNumber value={intervalMillis} onChange={v => setIntervalMillis(v as number)} style={{ width: '6em' }} min={10}  /> 毫秒（数字越小滚的越快）
                 </Typography.Text>
             </Space>
             <Button onClick={students.length ? next : openUpload} style={{ marginTop: 16 }}>

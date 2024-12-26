@@ -8,6 +8,8 @@ export const RollCallConfigContext = createContext<{
     setRemoveCalled: Dispatch<SetStateAction<boolean>>;
     callCount: number;
     setCallCount: Dispatch<SetStateAction<number>>;
+    intervalMillis: number;
+    setIntervalMillis: Dispatch<SetStateAction<number>>;
 }>({
     students: [],
     setStudents: () => {},
@@ -15,6 +17,8 @@ export const RollCallConfigContext = createContext<{
     setRemoveCalled: () => {},
     callCount: 1,
     setCallCount: () => {},
+    intervalMillis: 50,
+    setIntervalMillis: () => {},
 });
 
 export const useRollCallConfig = () => useContext(RollCallConfigContext);

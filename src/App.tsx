@@ -11,11 +11,12 @@ function App() {
   const [students, setStudents] = useState<StudentType[]>([]);
   const [removeCalled, setRemoveCalled] = useState<boolean>(false);
   const [callCount, setCallCount] = useState<number>(1);
+  const [intervalMillis, setIntervalMillis] = useState<number>(50);
   const [step, setStep] = useState<number>(0);
 
   return (
     <StepContext.Provider value={{ step, next: () => setStep(prev => prev + 1), prev: () => setStep(prev => prev - 1) }}>
-      <RollCallConfigContext.Provider value={{ students, setStudents, removeCalled, setRemoveCalled, callCount, setCallCount }}>
+      <RollCallConfigContext.Provider value={{ students, setStudents, removeCalled, setRemoveCalled, callCount, setCallCount, intervalMillis, setIntervalMillis }}>
         <main className="container">
           {step === 0 && <RollCallConfig />}
           {step === 1 && <Roll />}

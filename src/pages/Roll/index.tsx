@@ -8,48 +8,51 @@ import { StudentType } from "../../types/students";
 const Roll = () => {
     const { prev } = useStep();
 
-    const { students, removeCalled, callCount } = useRollCallConfig();
+    const { students, removeCalled, callCount, intervalMillis } = useRollCallConfig();
     const [remainingStudents, setRemainingStudents] = useState<StudentType[]>(students);
     const [rolling, setRolling] = useState(false);
     const intervalRef = useRef<number>();
     const calledStudentsRef = useRef<StudentType[]>([]);
     const [rolledAt, setRolledAt] = useState<Date>();
 
+    const roll = useCallback(() => {
+        setRolledAt(new Date());
+        let calledStudentsThisRound: StudentType[] = [];
+
+        let studentsThisRound = [...remainingStudents];
+        let studentCountToCallThisRound = Math.min(callCount, studentsThisRound.length);
+        for (let i = 0; i < studentCountToCallThisRound; i++) {
+            const called = studentsThisRound[Math.floor(Math.random() * studentsThisRound.length)];
+            calledStudentsThisRound.push(called);
+            studentsThisRound = studentsThisRound.filter(s => s.name !== called.name);
+        }
+
+        calledStudentsRef.current = calledStudentsThisRound;
+        if (!studentsThisRound.length) {
+            clearInterval(intervalRef.current);
+            setRolling(false);
+            if (removeCalled) {
+                setRemainingStudents([]);
+            }
+        }
+    }, [intervalRef, calledStudentsRef, students, removeCalled, remainingStudents, setRolling, setRemainingStudents]);
+
     const pause = useCallback(() => {
         clearInterval(intervalRef.current);
+        roll();
         setRolling(false);
         if (removeCalled && !!calledStudentsRef.current.length) {
             const calledStudentNames = calledStudentsRef.current.map(s => s.name);
             setRemainingStudents(prev => prev.filter(s => !calledStudentNames.includes(s.name)));
         }
-    }, [intervalRef, setRolling, removeCalled, setRemainingStudents])
+    }, [roll, intervalRef, setRolling, removeCalled, calledStudentsRef, setRemainingStudents])
 
     const start = useCallback(() => {
-        const roll = () => {
-            setRolledAt(new Date());
-            let calledStudentsThisRound: StudentType[] = [];
-
-            let studentsThisRound = [...remainingStudents];
-            let studentCountToCallThisRound = Math.min(callCount, studentsThisRound.length);
-            for (let i = 0; i < studentCountToCallThisRound; i++) {
-                const called = studentsThisRound[Math.floor(Math.random() * studentsThisRound.length)];
-                calledStudentsThisRound.push(called);
-                studentsThisRound = studentsThisRound.filter(s => s.name !== called.name);
-            }
-
-            calledStudentsRef.current = calledStudentsThisRound;
-            if (!studentsThisRound.length) {
-                clearInterval(intervalRef.current);
-                setRolling(false);
-                if (removeCalled) {
-                    setRemainingStudents([]);
-                }
-            }
-        }
-
+        roll();
         setRolling(true);
-        intervalRef.current = setInterval(roll, 200);
-    }, [intervalRef, calledStudentsRef, students, removeCalled, remainingStudents, setRolling, setRemainingStudents, pause]);
+        intervalRef.current && clearInterval(intervalRef.current);
+        intervalRef.current = setInterval(roll, intervalMillis);
+    }, [roll, intervalRef, setRolling, setRemainingStudents, pause, intervalMillis]);
 
     const restart = useCallback(() => {
         calledStudentsRef.current = [];
@@ -68,7 +71,7 @@ const Roll = () => {
 
     return (
         <>
-            <Layout style={{ height: 'calc(100vh - 180px)'}}>
+            <Layout style={{ height: 'calc(100vh - 180px)' }}>
                 <Layout.Header style={{ display: 'flex' }}>
                     <Button onClick={prev}>
                         <IconArrowLeft />
